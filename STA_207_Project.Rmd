@@ -1,0 +1,119 @@
+---
+title: "STA 207 Project"
+author: "Ivan Karpov"
+date: "2025-03-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+library(haven)
+STAR_Students <- read_sav("C:/Users/Ivan/Downloads/STAR_Students.sav")
+```
+
+```{r}
+math_score <- STAR_Students$g3mathcomputss
+urban_status <- as.factor(STAR_Students$g3surban)
+class_type <- as.factor(STAR_Students$cmpstype)
+```
+
+```{r}
+math_score[0:50]
+```
+
+```{r}
+urban_status[0:50]
+```
+```{r}
+class_type[0:50]
+```
+```{r}
+summary(math_score)
+```
+```{r}
+hist(math_score)
+```
+
+```{r}
+summary(urban_status)
+```
+
+```{r}
+summary(class_type)
+```
+
+```{r}
+par(mfrow=c(1,3))
+boxplot(math_score)
+hist(as.numeric(class_type))
+hist(as.numeric(urban_status))
+
+```
+```{r}
+plot(urban_status, class_type, xlab = 'Urban Status', ylab = 'Class Type')
+```
+```{r}
+library(dplyr)
+```
+```{r}
+STAR_grouped <- STAR_Students %>%
+  group_by(g3surban, cmpstype) %>%
+  summarize(mean_value = mean(g3mathcomputss,na.rm = TRUE))
+
+
+STAR_grouped
+```
+
+```{r}
+model <- aov(g3mathcomputss ~ g3surban * cmpstype,
+  data = STAR_Students
+)
+
+summary(model)
+```
+```{r}
+model_reduced <- aov(g3mathcomputss ~ g3surban + cmpstype,
+  data = STAR_Students
+)
+
+summary(model_reduced)
+```
+```{r}
+anova(model, model_reduced)
+```
+```{r}
+model2 <- aov(g3mathcomputss ~ factor(g3surban) + factor(cmpstype), data = STAR_Students)
+model2
+```
+
+
+```{r}
+tukey_test <- TukeyHSD(model2)
+tukey_test
+```
+
+```{r}
+par(mfrow=c(1,2))
+plot(tukey_test)
+```
+
+
+```{r}
+par(mfrow=c(2,2))
+plot(model)
+```
+```{r}
+model1 <- lm(formula = g3mathcomputss ~ factor(g3surban) * factor(cmpstype), data = STAR_Students)
+summary(model1)
+```
+
+
+
+
+
+
